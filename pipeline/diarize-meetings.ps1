@@ -107,7 +107,6 @@ try {
             if ($LASTEXITCODE -ne 0) {
                 throw "WhisperX failed for '$($audioFile.FullName)' with exit code $LASTEXITCODE."
             }
-            Remove-Item -LiteralPath $audioFile.FullName -Force
         }
     }
 }

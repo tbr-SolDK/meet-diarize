@@ -21,7 +21,7 @@ Put recordings in `input\` (subfolders are supported), then run:
 .\pipeline\run-meetings.ps1
 ```
 
-Supported formats include MP4, MOV, MKV, AVI, WebM, WMV, WAV, MP3, M4A, AAC, FLAC, OGG, and WMA. FFmpeg normalizes each recording to a temporary WAV under `output\.audio\`; WhisperX writes VTT, SRT, and JSON transcripts under `output\`, preserving input subfolders. The original recordings are left unchanged.
+Supported formats include MP4, MOV, MKV, AVI, WebM, WMV, WAV, MP3, M4A, AAC, FLAC, OGG, and WMA. FFmpeg normalizes each recording to a WAV under `output\.audio\`; the extracted audio is kept after transcription. WhisperX writes VTT, SRT, and JSON transcripts under `output\`, preserving input subfolders. The original recordings are left unchanged.
 
 The default language is Danish (`da`), model is `medium`, device is CPU, and compute type is `int8`. Override settings when needed:
 

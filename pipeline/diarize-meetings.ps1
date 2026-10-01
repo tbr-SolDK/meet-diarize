@@ -3,7 +3,9 @@ param(
     [ValidateSet('cpu', 'cuda')]
     [string] $Device,
     [string] $Model,
-    [string] $Language = 'da',
+    [Parameter(Mandatory)]
+    [ValidatePattern('^[a-z]{2,3}$')]
+    [string] $Language,
     [string] $ComputeType,
     [int] $BatchSize,
     [ValidateSet('vtt', 'srt', 'json', 'all')]
@@ -91,7 +93,7 @@ try {
         $arguments = @(
         $audioFile.FullName,
         '--model', $Model,
-        '--language', $Language,
+        '--language', $Language.ToLowerInvariant(),
         '--device', $Device,
         '--compute_type', $ComputeType,
         '--batch_size', $BatchSize,

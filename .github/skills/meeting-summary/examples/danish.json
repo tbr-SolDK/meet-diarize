@@ -1,0 +1,12 @@
+{
+  "language": "da",
+  "segments": [
+    {"start": 0, "end": 9, "text": "Vi drøfter en prøve af Demo. Jeg foreslår at starte fredag.", "speaker": "SPEAKER_00"},
+    {"start": 10, "end": 19, "text": "Det aftaler vi, men kun i testmiljøet og efter godkendelse. Produktion er ikke omfattet.", "speaker": "SPEAKER_01"},
+    {"start": 20, "end": 29, "text": "Jeg undersøger godkendelsen i morgen. Vi har ikke aftalt, hvem der starter prøven.", "speaker": "SPEAKER_00"},
+    {"start": 30, "end": 39, "text": "Jeg sender testresultaterne. Der er ikke aftalt en frist.", "speaker": "SPEAKER_01"},
+    {"start": 40, "end": 49, "text": "Vi ved ikke, om miljøet er klar. Det er en risiko, ikke en aftale om ekstra arbejde.", "speaker": "SPEAKER_01"},
+    {"start": 50, "end": 59, "text": "Så tager vi godkendelsesstatus op igen næste onsdag. Det er aftalt.", "speaker": "SPEAKER_02"}
+  ],
+  "word_segments": []
+}

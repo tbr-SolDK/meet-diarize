@@ -1,0 +1,21 @@
+{
+  "notice": "Entirely synthetic test data; each scenario is independent, never combine as meeting sources.",
+  "cases": [
+    {"id": "missing-language", "source": {"segments": [{"start": 0, "end": 5, "text": "We discussed the demo.", "speaker": "SPEAKER_00"}], "word_segments": []}, "expected": "Ask language; no default from text."},
+    {"id": "invalid-language", "source": {"language": 42, "segments": [{"start": 0, "end": 5, "text": "We discussed the demo."}], "word_segments": []}, "expected": "Ask language; retain invalid raw evidence."},
+    {"id": "conflicting-language", "source": {"language": "da", "segments": [{"start": 0, "end": 5, "text": "We are speaking English today."}], "word_segments": []}, "expected": "Surface conflict and ask; do not silently select Danish."},
+    {"id": "mixed-language", "source": {"language": "da", "segments": [{"start": 0, "end": 5, "text": "Vi drøfter prøven."}, {"start": 6, "end": 10, "text": "Let's continue in English for the other half of this meeting."}], "word_segments": []}, "expected": "Ask user to choose minutes language."},
+    {"id": "skipped-language", "source": {"segments": [{"start": 0, "end": 5, "text": "Discuss the demo."}]}, "user_answer": "Skip", "expected": "Resolved language null; no minutes drafted or checked final."},
+    {"id": "no-outcomes", "source": {"language": "en", "segments": [{"start": 0, "end": 5, "text": "We discussed two layouts. Both are proposals; no decisions or actions were agreed."}]}, "expected": "No invented tasks, owners, decisions or follow-up; omit empty sections."},
+    {"id": "mixed-speaker", "source": {"language": "en", "segments": [{"start": 0, "end": 5, "text": "I'll check the logs.", "speaker": "SPEAKER_00"}]}, "user_answer": "SPEAKER_00 contains Alex and Jordan; I cannot tell who said this.", "expected": "Mixed mapping with no single confirmed person; task remains attributed to mixed SPEAKER_00."},
+    {"id": "relative-date-no-anchor", "source": {"language": "en", "segments": [{"start": 0, "end": 5, "text": "I'll check tomorrow.", "speaker": "SPEAKER_00"}]}, "basename": "Demo-2026-09-30.json", "user_answer": "Skip date confirmation", "expected": "Filename candidate unconfirmed; keep tomorrow ambiguous, never normalize to today or filename date."},
+    {"id": "bad-metadata", "metadata_text": "{\"schema_version\":1,", "expected": "Explicit invalid JSON blocker; request repair or authorized replacement; no silent fallback."},
+    {"id": "incompatible-metadata", "metadata": {"schema_version": 99}, "expected": "Explicit incompatible version; no guessed migration."},
+    {"id": "false-confirmation", "metadata": {"schema_version": 1, "speaker_mappings": [{"speaker_ids": ["SPEAKER_00"], "status": "identified", "person": {"name": "Alex"}, "provenance": [{"kind": "filename", "reference": "Alex-demo.json", "evidence": "Name in filename"}], "confirmed": true}]}, "expected": "Reject confirmation without user provenance; do not identify Alex."},
+    {"id": "source-change", "old_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", "new_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", "user_answer": "Skip recording identity confirmation", "expected": "Old mappings not reused; review invalidated; preserve old sidecar."},
+    {"id": "user-language-correction", "source": {"language": "da", "segments": [{"start": 0, "end": 5, "text": "We speak English today."}]}, "user_answer": "The transcription setting was wrong; the meeting is English. Use English.", "expected": "English output, user choice provenance, retained source conflict, no second reviewer after correction."},
+    {"id": "overwrite-declined", "existing_artifacts": ["demo.summary.md", "demo.meeting.json"], "user_answer": "Do not overwrite", "expected": "Neither file replaced; ask destination or stop."},
+    {"id": "incomplete-review", "review_result": {"completion": "partial", "coverage": {"source_complete": false, "missing_ranges": [{"first": 6, "last": 7, "unit": "segment"}]}}, "expected": "Marked UNREVIEWED DRAFT with missing ranges in summary and sidecar, never reviewed final; no second reviewer."},
+    {"id": "unavailable-reviewer", "delegation_available": false, "expected": "Marked draft only with unavailable-review reason persisted in summary and sidecar; no self-review substitute."}
+  ]
+}

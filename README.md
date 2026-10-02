@@ -44,3 +44,79 @@ Run the lightweight review and comparison tests with the bootstrapped Python:
 ```
 
 `pipeline\validate-transcripts.py` remains available for optional Teams-versus-WhisperX comparisons when a Teams reference VTT is available; the review page does not require one.
+
+## Manual Copilot meeting minutes
+
+This repository includes a `meeting-summary` skill and `meeting-assistant` /
+`meeting-reviewer` custom agents for **manual, internal minutes**. Nothing runs
+automatically after transcription, and the transcription scripts are unchanged.
+Use a current authenticated Copilot CLI from this repository, with custom-agent
+delegation and the question tool available:
+
+```powershell
+copilot skill list
+copilot --agent meeting-assistant --excluded-tools skill,sql -i "Use /meeting-summary for output\team\2026-09-30-demo.json. This recording is approved for the configured Copilot processing. Load SKILL.md directly if the skill helper is unavailable."
+```
+
+Use one selected transcript, preferably WhisperX JSON. VTT/SRT are supported
+but have unknown speaker attribution unless reliably established. The assistant
+reads the complete source and matching metadata, asks only material missing
+facts one at a time (skip allowed), drafts minutes, invokes exactly one
+read-only reviewer, and reconciles its findings. Reusable confirmations avoid
+repeated questions on the same unchanged recording.
+
+**Language follows the meeting.** Reliable JSON `language` is used, but this
+pipeline passes the user's transcription setting to WhisperX; it is not
+guaranteed autodetection. Missing, invalid, conflicting or mixed language
+requires a question, as does VTT/SRT without reliable matching metadata.
+Danish and English are primary choices; another language can be supplied.
+A user correction is authoritative. Skipping language stops drafting: there
+is never a silent Danish default.
+
+Outputs next to the source under `output\` preserve subfolders:
+`<stem>.summary.md` contains timestamp-grounded minutes, and
+`<stem>.meeting.json` contains versioned source identity, fact provenance,
+recording-specific speaker mappings, optional confirmed attendance, language
+choice and review state. Several speaker IDs may map to one person; mixed or
+unknown IDs remain uncertain. Speaking and confirmed attendance (including
+silent attendees) are separate. Missing owners/deadlines stay `Ikke aftalt` /
+`Not agreed`; proposals and later reversed decisions are not final agreements.
+Relative dates need a reliable meeting-date anchor. Originals are never edited.
+Existing artifacts require overwrite consent; sources outside `output\`
+require destination confirmation. Malformed, incompatible or stale sidecars
+are surfaced rather than silently applied.
+
+**Limits and privacy:** Local audio transcription does **not** mean local
+Copilot inference. Ensure recordings are approved for the configured Copilot
+processing before use. No credentials, private development recordings or other
+external services are needed. This workflow does not publish, send messages,
+create tasks externally, or commit meeting artifacts. Keep outputs under the
+existing ignored `output\` tree; never force-add them. For an approved alternate
+destination, arrange equivalent exclusions before saving.
+
+The reviewer is configured with `read` / `search` aliases plus concrete local
+`rg` / `glob` names. CLI 1.0.90-5 also exposes intrinsic `skill` / `sql` helpers
+despite profile allowlists: the command above excludes those process-wide so
+the reviewer is read/search-only (a parallel-read wrapper is harmless).
+The assistant loads the skill file directly when the helper is excluded.
+Verify effective tools
+against installed CLI tool availability, not just YAML. Separate context is
+not a truth guarantee, and review is against transcript text, not audio.
+Unavailable delegation, unsafe permissions or incomplete source coverage permits
+only a prominently marked **UNREVIEWED DRAFT** (or Danish equivalent), with
+coverage and limitations persisted in both summary and sidecar. One reviewer
+pass is mandatory for reviewed minutes; no self-review substitute or extra
+chunk agents. A missing hashing capability prevents reusable metadata.
+
+Shared policy and templates live in `.github\skills\meeting-summary\`;
+role profiles live in `.github\agents\`. New profiles may require a fresh CLI
+process; existing CLI skills can be reloaded with `/skills reload`.
+See `examples\acceptance.md` under the skill for synthetic semantic checks,
+including language questions, metadata reuse, injection, changed sources,
+reversed decisions and partial/unavailable review. Distinguish static checks,
+discovery/permissions, actual delegation and end-to-end behavior when reporting
+verification. Manual fixture inspection does not prove live model behavior.
+The dated execution record and unexercised checks are documented in
+`examples\verification.md` under the skill; it includes discovered CLI permission
+limitations and model errors caught during synthetic validation.
+No new dependencies or executable summarization pipeline are installed.
